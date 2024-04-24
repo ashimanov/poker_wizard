@@ -23,34 +23,21 @@ class App_logic:
     # check user input before beginning a new game round
     @staticmethod
     def _validate_play_round(game, cards, round):
-        if round == 0 and len(cards) > 2:
-            raise LogicException('Please specify exactly 2 cards for pre-flop round.')
-        if round == 0 and len(cards) < 2:
-            raise LogicException('Please specify exactly 2 cards for pre-flop round.')
-        if round == 0 and models.input_card_ranks[cards[0][0]] not in models.ranks:
-            raise LogicException('Wrong card input.')
-
-
-# ------------------ ADD INPUT CARDS VALIDITY CHECK --------------------------------------------
-
-
-
-
-        if round == 1 and len(cards) > 3:
-            raise LogicException('Please specify exactly 3 cards for the Flop round.')
-        if round == 1 and len(cards) < 3:
-            raise LogicException('Please specify exactly 3 cards for the Flop round.')
-        if round == 2 and len(cards) > 1:
-            raise LogicException('Please specify exactly 1 card for the Turn round.')
-        if round == 2 and len(cards) < 1:
-            raise LogicException('Please specify exactly 1 card for the Turn round.')
-        if round == 3 and len(cards) > 1:
-            raise LogicException('Please specify exactly 1 card for the River round.')
-        if round == 3 and len(cards) < 1:
-            raise LogicException('Please specify exactly 1 card for the River round.')
-        for card in cards:
+        for card in cards: # checks that cards are posted by user in 2-letter format
             if len(card) > 2 or len(card) < 2:
                 raise LogicException('Wrong input format. Please use "5H|QS" format. 2 symbols per card.T for 10.')
+            if card[0] not in models.input_card_ranks.keys() or card[1] not in models.input_card_suits.keys(): # checks that card posted exists in deck and no non-existent entries like 1R have been posted by user.
+                raise LogicException('Wrong card input. Card does not exist.')
+            
+        # checks that the user posted correct number of cards for the corresponding round of the game
+        if round == 0 and len(cards) > 2 or len(cards) < 2:
+            raise LogicException('Please specify exactly 2 cards for pre-flop round.')
+        if round == 1 and len(cards) > 3 or len(cards) < 3:
+            raise LogicException('Please specify exactly 3 cards for the Flop round.')
+        if round == 2 and len(cards) > 1 or len(cards) < 1:
+            raise LogicException('Please specify exactly 1 card for the Turn round.')
+        if round == 3 and len(cards) > 1 or len(cards) < 1:
+            raise LogicException('Please specify exactly 1 card for the River round.')
             
     # formats game starting data    
     @staticmethod
@@ -68,8 +55,8 @@ class App_logic:
             number_of_players = len(players_names_data)# number of players declaired for the game
             number_of_listed_players = 0 # number of players listed for the game
             new_game = models.Game()
-            while number_of_players >= 1:
-                setattr(new_game, 'player'+str(number_of_listed_players + 1), models.Player(players_names_data[number_of_listed_players])) # creating Players (player1, player2 etc) in the instance of the Game
+            while number_of_players > 0:
+                setattr(new_game, 'player'+str(number_of_listed_players + 1), models.Player(players_names_data[number_of_listed_players])) # creates Players (player1, player2 etc) in the instance of the Game (in other words - lists players for the game)
                 number_of_players -= 1
                 number_of_listed_players += 1
             return new_game
@@ -132,13 +119,13 @@ class App_logic:
                 is_active = 'is over'
             game_info_raw.append(f'Game {is_active}')
 
-            # lists players in the game
+            # creates a list of players in the game
             players = [' ', 'Players in the game:', ' ']
             for player in vars(game):
                 if 'player' in player:
                     players.append(f' {player}: {getattr(getattr(game, str(player)), "name")}')
 
-            game_info = '\n '.join((game_info_raw + players)) # binds together game status and players
+            game_info = '\n '.join((game_info_raw + players)) # binds together game status and players for use in the 'return' 
             player_hand = self.player_hand(_id) # gets player's hand from the specified stored game
 
             return f'\n Game #{_id} info: {game_info}\n\n Your hand: {player_hand}\n Community cards: {game.community_cards}\n Game round: {game.round}\n'
@@ -184,7 +171,7 @@ class App_logic:
                 self._validate_play_round(game, user_input, game.round) # validates user_input to be playing cards
                 game.cards_posted[game.round] = True # changes cards_posted attribute to be True
                 save_result = self._game_db.save_game(game, int(_id)) # saves the game 
-                return f'\n Your hand: {game.player1.player_hand}.\n Community cards: {game.community_cards}\n\n {self._game_calc.calculate_win_chance(game)}\n'
+                return f'\n Your hand: {game.player1.player_hand}.\n Community cards: {game.community_cards}\n\n {self._game_calc.calculate_win_chance(game)}\n user_input = {user_input}'
         except Exception as ex:
             return f'logic exception with play: {ex}'
         

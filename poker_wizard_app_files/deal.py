@@ -35,7 +35,7 @@ class GameDeal:
                         cards_to_deal -= 1
                     return game
                 
-                # flop round, burns the 1st card, then deals three community cards        
+                # flop round, burns the 1st card, then deals three community cards and stores them in game.community_cards       
                 case 1:
                     game.deck.pop(random.randrange(0, len(game.deck))) # burns the first card
                     cards_to_deal = 3
@@ -44,7 +44,7 @@ class GameDeal:
                         cards_to_deal -= 1
                     return game
                 
-                # turn round, burns the 1st card, then deals one community card
+                # turn round, burns the 1st card, then deals one community card and stores it in game.community_cards
                 case 2:
                     game.deck.pop(random.randrange(0, len(game.deck))) # burns the first card
                     cards_to_deal = 1
@@ -53,7 +53,7 @@ class GameDeal:
                         cards_to_deal -= 1
                     return game
                 
-                # river round, burns the 1st card, then deals one community card
+                # river round, burns the 1st card, then deals one community card and stores it in game.community_cards
                 case 3:
                     game.deck.pop(random.randrange(0, len(game.deck))) # burns the first card
                     cards_to_deal = 1
