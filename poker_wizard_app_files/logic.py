@@ -71,7 +71,6 @@ class App_logic:
         except Exception as ex:
             return f'logic exception with player_hand: {ex}'
     
-   
     # returns a list of finished and active games
     def list_games(self):
         try:
@@ -82,7 +81,6 @@ class App_logic:
             return games_list
         except Exception as ex:
             return f'logic exception with list_games: {ex}'
-
 
     # joins and returns info on how to run the app (from rules.py)
     def print_rules(self):

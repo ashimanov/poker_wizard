@@ -17,7 +17,7 @@ GAME_ROOT = API_ROOT + '/game'
 def list_games():
     try:
         games_list = _app_logic.list_games()
-        return games_list
+        return f'\n{games_list}\n'
     except Exception as ex:
         return f'api exception, could not list_games: {ex}', 404
 
