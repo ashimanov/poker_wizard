@@ -148,8 +148,9 @@ class App_logic:
                 self._validate_play_round(game, user_input, game.round)
                 game.cards_posted[game.round] = True
                 game.active = False
+                win_chance = self._game_calc.calculate_win_chance(game.player1.player_hand, game.community_cards)
                 save_result = self._game_db.save_game(game, int(_id))
-                return f'\n Your hand: {game.player1.player_hand}.\n Community cards: {game.community_cards}\n\n {self._game_calc.calculate_win_chance(game)}\n'
+                return f'\n Your hand: {game.player1.player_hand}.\n Community cards: {game.community_cards}\n\n {win_chance}\n'
 
             
             # if the game round is None it starts the game
@@ -168,8 +169,9 @@ class App_logic:
             elif game.round != None and game.cards_posted[game.round] == False: # checks if the game has begun (game round != None) and player hasn't posted their cards (game.cards_posted[game.round] == Flase
                 self._validate_play_round(game, user_input, game.round) # validates user_input to be playing cards
                 game.cards_posted[game.round] = True # changes cards_posted attribute to be True
-                save_result = self._game_db.save_game(game, int(_id)) # saves the game 
-                return f'\n Your hand: {game.player1.player_hand}.\n Community cards: {game.community_cards}\n\n {self._game_calc.calculate_win_chance(game)}\n\n'
+                win_chance = self._game_calc.calculate_win_chance(game.player1.player_hand, game.community_cards)
+                save_result = self._game_db.save_game(game, int(_id)) # saves the game
+                return f'\n Your hand: {game.player1.player_hand}.\n Community cards: {game.community_cards}\n\n {win_chance}\n\n'
         except Exception as ex:
             return f'logic exception with play: {ex}'
         
