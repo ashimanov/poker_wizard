@@ -30,13 +30,13 @@ class App_logic:
                 raise LogicException('Wrong card input. Card does not exist.')
             
         # checks that the user posted correct number of cards for the corresponding round of the game
-        if round == 0 and len(cards) > 2 or len(cards) < 2:
+        if round == 0 and (len(cards) > 2 or len(cards) < 2):
             raise LogicException('Please specify exactly 2 cards for pre-flop round.')
-        if round == 1 and len(cards) > 3 or len(cards) < 3:
+        if round == 1 and (len(cards) > 3 or len(cards) < 3):
             raise LogicException('Please specify exactly 3 cards for the Flop round.')
-        if round == 2 and len(cards) > 1 or len(cards) < 1:
+        if round == 2 and (len(cards) > 1 or len(cards) < 1):
             raise LogicException('Please specify exactly 1 card for the Turn round.')
-        if round == 3 and len(cards) > 1 or len(cards) < 1:
+        if round == 3 and (len(cards) > 1 or len(cards) < 1):
             raise LogicException('Please specify exactly 1 card for the River round.')
             
     # formats game starting data    
@@ -156,7 +156,7 @@ class App_logic:
             if game.round == None and user_input == ['deal']: # deals cards after getting the ['deal'] command
                 return self.play_round(game, _id)
             elif game.round == None and user_input != ['deal']: # asks for the ['deal'] command to begin the pre-flop round
-                return f'\nPlease post "deal" command to begin the pre-flop round.\n\n user_input = {user_input}\n'
+                return f'\nPlease post "deal" command to begin the pre-flop round.\n\n'
             
             # if game has begun it begins following rounds
             elif game.round != None and game.cards_posted[game.round] == True and user_input != ['deal']: # checks if the game has begun (game round != None), player has posted their cards (game.cards_posted[game.round] == True) and user_input != ['deal'] --- and asks to post a correct command ['deal'] to begin the next round
@@ -169,7 +169,7 @@ class App_logic:
                 self._validate_play_round(game, user_input, game.round) # validates user_input to be playing cards
                 game.cards_posted[game.round] = True # changes cards_posted attribute to be True
                 save_result = self._game_db.save_game(game, int(_id)) # saves the game 
-                return f'\n Your hand: {game.player1.player_hand}.\n Community cards: {game.community_cards}\n\n {self._game_calc.calculate_win_chance(game)}\n user_input = {user_input}'
+                return f'\n Your hand: {game.player1.player_hand}.\n Community cards: {game.community_cards}\n\n {self._game_calc.calculate_win_chance(game)}\n\n'
         except Exception as ex:
             return f'logic exception with play: {ex}'
         
@@ -203,7 +203,7 @@ class App_logic:
             round = game.round # identifies the current game round
             game = self._game_deal.deal_cards(game, round)
             save_result = self._game_db.save_game(game, int(_id)) # stores the game in the storage, here _id is converted to int type as the dictionary in storage uses integers as keys. save_game is used to store the game in the storage.
-            return f'\n\n The {self.round_name(round)} has started! Game round: {round} ({self.round_name(round)}).\n All players have been dealt 2 cards.\n Your cards: {game.player1.player_hand}\n Community cards: {game.community_cards}\n\n Post your cards to complete {self.round_name(round)}. \n\n Cards in deck: {len(game.deck)}\n {save_result}\n'
+            return f'\n\n The {self.round_name(round)} has started! Game round: {round} ({self.round_name(round)}).\n All players have been dealt 2 cards.\n Your cards: {game.player1.player_hand}\n Community cards: {game.community_cards}\n\n Post the dealt cards to complete {self.round_name(round)}.\n\n Cards still in deck: {len(game.deck)}\n {save_result}\n'
         except Exception as ex:
             return f'logic exception with play_round: {ex}'
 
